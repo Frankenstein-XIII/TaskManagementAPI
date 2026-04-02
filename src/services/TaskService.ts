@@ -19,6 +19,20 @@ class TaskService{
             return newFeature;
       }
 
+      deleteTask(id: string):boolean{
+            const initialLength = this.tasks.length;
+            this.tasks = this.tasks.filter(task=>task.id !==id);
+            return this.tasks.length<initialLength;
+      }
+      updateTaskStatus(id:string, newStatus:'open'| 'in-progress'|'closed'):BaseTask|null{
+            const task = this.tasks.find(t=>t.id ===id);
+            if (task){
+                  task.status = newStatus;
+                  return task;
+            }
+            return null;
+      }
+
       getAllTasks(): BaseTask[]{
             return this.tasks;
       }
