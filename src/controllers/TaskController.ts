@@ -44,4 +44,47 @@ export class TaskController{
                   next(error);
             }
       }
+
+      public static deleteTask(req:Request, res:Response, next:NextFunction): void{
+            try{
+                  const {id} = req.params; //Get id from the URL
+                  if (typeof id !== 'string'){
+                        throw new AppError(404, "A valid Task ID is required.");
+                  }
+                  const isDeleted = taskService.deleteTask(id);
+
+                  if (!isDeleted){
+                        throw new AppError(404, `Task ID: ${id} not found`);
+                  }
+                  res.status(200).json({message: "Task deleted sucessfully."})
+            }
+            catch(error){
+                  next(error);
+            }
+      }
+      public static updateStatus(req: Request, res:Response, next:NextFunction): void{
+            try{
+                  const {id} = req.params;
+                  const{status} = req.body;
+
+                  const validStatuses = ['open', 'in-progress','closed'];
+
+                  // validation: Check ID and if status if one of our allowed string
+                  if(typeof id !=='string' || !validStatuses.includes(status)){
+                        throw new AppError(400, "Invalid ID or Status. Use: open, in-progress,  or closed");
+                  }
+
+                  const updatedTask = taskService.updateTaskStatus(id, status);
+                  if (!updatedTask){
+                        throw new AppError(404, `Task with ID ${id} not found.`);
+                  }
+            
+                  res.status(200).json(updatedTask);
+            }
+            catch(error){
+                  next(error);
+            }
+      }
+
+
 }
