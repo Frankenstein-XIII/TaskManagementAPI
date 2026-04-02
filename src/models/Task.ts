@@ -4,7 +4,7 @@
 export interface ITask{
       id: string;
       title: string;
-      status: 'opne'|'in-progress'|'closed';
+      status: 'open'|'in-progress'|'closed';
 }
 
 //2. the Abstract class (The blueprint)
