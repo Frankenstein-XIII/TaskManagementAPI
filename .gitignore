@@ -1,0 +1,12 @@
+# dependencies 
+node_modules/
+
+# production build 
+dist/ 
+
+# environment variables (for later)
+.env 
+
+# logs and OS files 
+npm-debug.log*
+.DS_Store
