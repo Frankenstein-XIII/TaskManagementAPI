@@ -21,6 +21,7 @@ export class TaskController{
             const{ title, severity} = req.body;
             if (!title || !severity){
                   res.status(400).json({message: "Messing title or severity"});
+                  return;
             }
 
             const newBug = taskService.createBug(title, severity);
@@ -57,6 +58,7 @@ export class TaskController{
                         throw new AppError(404, `Task ID: ${id} not found`);
                   }
                   res.status(200).json({message: "Task deleted sucessfully."})
+                  
             }
             catch(error){
                   next(error);
@@ -85,6 +87,4 @@ export class TaskController{
                   next(error);
             }
       }
-
-
 }
