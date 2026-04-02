@@ -1,5 +1,6 @@
-import {Request, Response} from 'express';
+import {NextFunction, Request, Response} from 'express';
 import { taskService } from '../services/TaskService';
+import { AppError } from '../utils/AppError';
 
 export class TaskController{
       //GET task 
@@ -27,14 +28,20 @@ export class TaskController{
       }
 
       // POST /task/feature
-      public static createFeature(req: Request, res: Response): void{
-            const {title, impactScore} = req.body;
-
-            if(!title|| !impactScore ===undefined){
-                  res.status(400).json({message: "Missing title or impactScore"});
+      public static createFeature(req: Request, res: Response, next: NextFunction): void{
+            try{
+                  const {title, impactScore} = req.body;
+                  const numericImpact = Number(impactScore);
+                  if(!title|| impactScore ===null || Number.isNaN(numericImpact)){
+                        throw new AppError(400, "Vlalid title and numric impactScore are required.")
+                  }
+                  // business logic 
+                  const newFeature = taskService.createFeature(title, Number(impactScore));
+                  // success reponse 
+                  res.status(201).json(newFeature)
             }
-
-            const newFeature = taskService.createFeature(title, Number(impactScore));
-            res.status(201).json(newFeature)
+            catch (error){
+                  next(error);
+            }
       }
 }
