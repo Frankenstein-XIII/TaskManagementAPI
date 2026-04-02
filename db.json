@@ -1,0 +1,30 @@
+[
+  {
+    "title": "wrong data calculation",
+    "id": "peslqcm",
+    "createdAt": "2026-04-02T15:52:08.731Z",
+    "status": "open",
+    "severity": "very high"
+  },
+  {
+    "title": "routing issue",
+    "id": "atj5j1x",
+    "createdAt": "2026-04-02T15:53:03.143Z",
+    "status": "open",
+    "severity": "critical"
+  },
+  {
+    "title": "new database feature is added",
+    "id": "8v963n5",
+    "createdAt": "2026-04-02T15:53:56.853Z",
+    "status": "closed",
+    "impactScore": 10
+  },
+   {
+     "title": "database feature is added",
+     "id": "8v963n5",
+     "createdAt": "2026-04-02T15:53:56.853Z",
+     "status": "closed",
+     "impactScore": 10
+   }
+]
