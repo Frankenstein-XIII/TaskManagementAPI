@@ -52,3 +52,7 @@ taskflow-api/
 1. install libraries 
 - `npm install bcryptjs jsonwebtocken`
 - `npm install @types/bcryptjs @types/jsonwebtoken`
+
+----- adding MongoDB----
+1. install mongoose
+- `npm install mangoose`
