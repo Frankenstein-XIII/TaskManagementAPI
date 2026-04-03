@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {BaseTask, BugTask, FeatureTask} from '../models/Task';
 import { AppError } from '../utils/AppError';
-import { title } from 'node:process';
 
 class TaskService{
       // A privacy array to hold all our taks (polimorphism in action)
@@ -40,7 +39,7 @@ class TaskService{
                   //re-instantiate the classes so they have their methods back 
                   this.tasks = rawTasks.map((t:any) =>{
                       const task = t.tTtype === 'bug'?
-                      new BugTask(t.title, t.severity): new FeatureTask(t.title, t.impactScore);
+                      new BugTask(t.title, t.severity, t.dueDate): new FeatureTask(t.title, t.impactScore, t.dueDate);
 
                       return Object.assign(task,t);
                   });
@@ -51,16 +50,16 @@ class TaskService{
             }
       }
       //Create a new Bug 
-      createBug(title: string, severity: 'low'|'high'): BugTask{
-            const newBug = new BugTask(title, severity);
+      createBug(title: string, severity: 'low'|'high', dueDate: string): BugTask{
+            const newBug = new BugTask(title, severity, dueDate);
             this.tasks.push(newBug);
             this.saveToFile();
             return newBug;
       }
 
       // create a new Feature 
-      createFeature(title: string, impact: number): FeatureTask{
-            const newFeature = new FeatureTask(title, impact);
+      createFeature(title: string, impact: number, dueDate: string): FeatureTask{
+            const newFeature = new FeatureTask(title, impact, dueDate);
             this.tasks.push(newFeature);
             this.saveToFile();
             return newFeature;
@@ -108,6 +107,28 @@ class TaskService{
       // get a summary of everything (using that abstract method!)
       getInventorySummary(): string[]{
             return this.tasks.map(task => task.getSummary());
+      }
+
+
+      // TaskService dashboard 
+      getDashboardSummary(){
+            const allTasks = this.tasks;
+
+            return{
+                  totalTasks: allTasks.length,
+                  byStatus:{
+                        open: allTasks.filter(t=> t.status==='open').length,
+                        inProgress: allTasks.filter(t=> t.status ==='in-progress').length,
+                        closed: allTasks.filter(t=> t.status ==='closed').length,
+                  },
+                  byType:{
+                        bugs: allTasks.filter(t => t.tType ==='bug').length,
+                        features: allTasks.filter(t=> t.tType==='feature').length,
+                  },
+
+                  averageFeatureImpact: allTasks.filter((t):t is FeatureTask => t.tType ==='feature')
+                  .reduce((acc, curr, _, arr) => acc+curr.impactScore/arr.length, 0).toFixed(1)
+            }
       }
 }
 

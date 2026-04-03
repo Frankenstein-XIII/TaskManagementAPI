@@ -47,3 +47,8 @@ taskflow-api/
   "start": "node dist/app.js",
   "dev": "tsx watch src/app.ts"
 }
+
+--------------adding security layer----------
+1. install libraries 
+- `npm install bcryptjs jsonwebtocken`
+- `npm install @types/bcryptjs @types/jsonwebtoken`

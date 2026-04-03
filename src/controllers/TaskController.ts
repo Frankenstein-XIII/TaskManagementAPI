@@ -3,12 +3,14 @@ import { taskService } from '../services/TaskService';
 import { AppError } from '../utils/AppError';
 
 
+
 export class TaskController{
       //GET task 
       public static getAllTasks(req: Request, res: Response, next:NextFunction): void{
             try{
                   // extract query parameters from the url eg. /tasks?status=open&title=login
                   const {status, title, sortBy} = req.query;
+
 
                   // convert query params to string if they exist (express parses them as many types)
                   const statusFilter = typeof status ==='string' ? status: undefined;
@@ -31,26 +33,26 @@ export class TaskController{
 
       //POST/ task/bug
       public static createBug(req: Request, res: Response): void{
-            const{ title, severity} = req.body;
-            if (!title || !severity){
-                  res.status(400).json({message: "Messing title or severity"});
+            const{ title, severity, dueDate} = req.body;
+            if (!title || !severity || !dueDate || Number.isNaN(Date.parse(dueDate))){
+                  res.status(400).json({message: "Messing title, due date and severity are required"});
                   return;
             }
 
-            const newBug = taskService.createBug(title, severity);
+            const newBug = taskService.createBug(title, severity, dueDate);
             res.status(201).json(newBug);
       }
 
       // POST /task/feature
       public static createFeature(req: Request, res: Response, next: NextFunction): void{
             try{
-                  const {title, impactScore} = req.body;
+                  const {title, impactScore, dueDate} = req.body;
                   const numericImpact = Number(impactScore);
                   if(!title|| impactScore ===null || Number.isNaN(numericImpact)){
                         throw new AppError(400, "Vlalid title and numric impactScore are required.")
                   }
                   // business logic 
-                  const newFeature = taskService.createFeature(title, Number(impactScore));
+                  const newFeature = taskService.createFeature(title, Number(impactScore), dueDate);
                   // success reponse 
                   res.status(201).json(newFeature)
             }
@@ -97,6 +99,17 @@ export class TaskController{
                   res.status(200).json(updatedTask);
             }
             catch(error){
+                  next(error);
+            }
+      }
+
+      public static getDashboard(req:Request, res:Response, next:NextFunction): void{
+            try{
+                  const stats = taskService.getDashboardSummary();
+                  res.status(200).json(stats);
+
+            }
+            catch (error){
                   next(error);
             }
       }
