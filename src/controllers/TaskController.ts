@@ -2,18 +2,31 @@ import {NextFunction, Request, Response} from 'express';
 import { taskService } from '../services/TaskService';
 import { AppError } from '../utils/AppError';
 
+
 export class TaskController{
       //GET task 
-      public static getAllTasks(req: Request, res: Response): void{
-            const tasks = taskService.getAllTasks();
-            const summaries = taskService.getInventorySummary();
+      public static getAllTasks(req: Request, res: Response, next:NextFunction): void{
+            try{
+                  // extract query parameters from the url eg. /tasks?status=open&title=login
+                  const {status, title, sortBy} = req.query;
 
-            //we send back both the full objects and summaries 
-            res.status(200).json({
-                  count: tasks.length,
-                  tasks: tasks,
-                  summaries: summaries
-            });
+                  // convert query params to string if they exist (express parses them as many types)
+                  const statusFilter = typeof status ==='string' ? status: undefined;
+                  const titleFitler = typeof title ==='string' ? title: undefined;
+
+                  const sortOrder= (sortBy ==='oldest')? 'oldest': 'newest';
+
+                  // call search method 
+                  const filteredTasks = taskService.searchTask(statusFilter, titleFitler, sortOrder);
+
+                  res.status(200).json({
+                        count: filteredTasks.length,
+                        tasks: filteredTasks
+                  });
+            }
+            catch(error){
+                  next(error);
+            }
       }
 
       //POST/ task/bug
