@@ -1,7 +1,8 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 import {BaseTask, BugTask, FeatureTask} from '../models/Task';
 import { AppError } from '../utils/AppError';
+import { title } from 'node:process';
 
 class TaskService{
       // A privacy array to hold all our taks (polimorphism in action)
@@ -38,15 +39,10 @@ class TaskService{
 
                   //re-instantiate the classes so they have their methods back 
                   this.tasks = rawTasks.map((t:any) =>{
-                        if ("severity" in t) {
-                              const bug = new BugTask(t.title, t.severity);
-                              Object.assign(bug, t); // store id, date and status
-                              return bug;
-                        } else {
-                              const feat = new FeatureTask( t.title, t.impactScore);
-                              Object.assign(feat, t);
-                              return feat;
-                        }
+                      const task = t.tTtype === 'bug'?
+                      new BugTask(t.title, t.severity): new FeatureTask(t.title, t.impactScore);
+
+                      return Object.assign(task,t);
                   });
             }
             catch(error){
@@ -87,6 +83,23 @@ class TaskService{
                   return task;
             }
             return null;
+      }
+      searchTask(status?: string, title?:string, sortBy: 'newest'| 'oldest' = 'newest'):BaseTask[]{
+            let filtered = this.tasks.filter(task => {
+                  // if status is provided, it must mtach
+                  const matchesStatus = status? task.status === status: true;
+                  // if title is provided, it must be included (case insensetive)
+                  const matchesTitle = title? task.title.toLowerCase().includes(title.toLowerCase()):true;
+                  return matchesStatus && matchesTitle;
+            });
+
+            // sort the filtered results
+            return filtered.sort((a,b) =>{
+                  const timeA = new Date(a.createdAt).getTime();
+                  const timeB = new Date(b.createdAt).getTime();
+
+                  return sortBy == 'newest'? timeB-timeA: timeA-timeB;
+            })
       }
 
       getAllTasks(): BaseTask[]{
