@@ -4,6 +4,7 @@
 export interface ITask{
       id: string;
       title: string;
+      tType: 'bug'|'feature';
       status: 'open'|'in-progress'|'closed';
 }
 
@@ -13,6 +14,8 @@ export abstract class BaseTask implements ITask{
       public id: string;
       public createdAt: Date;
       public status: 'open'| 'in-progress'|'closed' = 'open';
+      // make tTtype abstract so the subclass must define it. 
+      public abstract tType: 'bug'|'feature';
 
       constructor(public title: string){
             this.id  = Math.random().toString(36).substring(2,9);
@@ -30,6 +33,7 @@ export abstract class BaseTask implements ITask{
 
 // 3. Concrete Class (The actual task)
 export class BugTask extends BaseTask{
+      public readonly  tType:'bug' = 'bug' as const;
       constructor(title: string, public severity: 'low'|'high'){
             super(title);
       }
@@ -40,6 +44,7 @@ export class BugTask extends BaseTask{
 }
 
 export class FeatureTask extends BaseTask{
+      public readonly tType: "feature" = "feature" as const;
       constructor(title: string, public impactScore: number){
             super(title);
       }
