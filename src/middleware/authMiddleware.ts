@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from 'jsonwebtoken';
 import { AppError } from "../utils/AppError";
+import { compareSync } from "bcryptjs";
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_for_dev_only';
 export interface AuthRequest extends Request{
@@ -12,10 +13,12 @@ export const authMiddleware = (req:AuthRequest, res:Response, next:NextFunction)
             // get the token from the authorization header 
             // standard format: "Bearer <token>"
             const authHeader = req.headers.authorization;
+            // console.log(authHeader);
             if(!authHeader?.startsWith('Bearer')){
                   throw new AppError(401, "Access denied. No token provided.");
             }
 
+            
             const token = authHeader.split(' ')[1];
             // verify the token 
             if(!token){
